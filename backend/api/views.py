@@ -7,15 +7,16 @@ from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from .paginations import LimitPagination
-from .filters import IngredientFilter, RecipeFilter
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                     ShoppingCart, Tag)
+                            ShoppingCart, Tag)
 from users.models import Follow, User
+
+from .filters import IngredientFilter, RecipeFilter
+from .paginations import LimitPagination
 from .permissions import IsAuthor, IsReadOnly
-from .serializers import (IngredientSerializer, RecipeCreateSerializer,
-                          RecipeSerializer, TagSerializer, TargetSerializer,
-                          FollowSerializer, UserSerializer)
+from .serializers import (FollowSerializer, IngredientSerializer,
+                          RecipeCreateSerializer, RecipeSerializer,
+                          TagSerializer, TargetSerializer, UserSerializer)
 
 
 class TagViewSet(viewsets.ModelViewSet):
