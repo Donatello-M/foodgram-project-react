@@ -10,7 +10,6 @@ from rest_framework.response import Response
 from ..recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                               ShoppingCart, Tag)
 from ..users.models import Follow, User
-
 from .filters import IngredientFilter, RecipeFilter
 from .paginations import LimitPagination
 from .permissions import IsAuthor, IsReadOnly
@@ -79,30 +78,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    @action(
-        detail=True,
-        methods=['POST', 'DELETE'],
-        permission_classes=[IsAuthenticated],
-    )
+    @action(detail=True, methods=['POST', 'DELETE'],
+            permission_classes=[IsAuthenticated],)
     def favorite(self, request, id=None):
-        response = self.processing_item(
-            request=request,
-            id=id,
-            obj=Favorite,
-        )
+        response = self.processing_item(request=request, id=id,
+                                        obj=Favorite,)
         return response
 
-    @action(
-        detail=True,
-        methods=['POST', 'DELETE'],
-        permission_classes=[IsAuthenticated],
-    )
+    @action(detail=True, methods=['POST', 'DELETE'],
+            permission_classes=[IsAuthenticated],)
     def shopping_cart(self, request, id=None):
-        response = self.processing_item(
-            request=request,
-            id=id,
-            obj=ShoppingCart,
-        )
+        response = self.processing_item(request=request, id=id,
+                                        obj=ShoppingCart,)
         return response
 
     @action(detail=False, methods=['GET'],
