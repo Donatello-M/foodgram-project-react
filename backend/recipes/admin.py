@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Favorite, Recipe, Cart
+from .models import Cart, Favorite, Recipe
 
 
 @admin.register(Recipe)

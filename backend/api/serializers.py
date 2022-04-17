@@ -1,15 +1,14 @@
-from rest_framework import serializers
+from re import compile
+
 from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from users.models import Follow, User
-from tags.models import Tag
-from recipes.models import Favorite, Recipe, ShoppingCart
 from ingredients.models import Ingredient, RecipeIngredient
-
-from re import compile
+from recipes.models import Favorite, Recipe, ShoppingCart
+from tags.models import Tag
+from users.models import Follow, User
 
 
 class UserSerializer(serializers.ModelSerializer):

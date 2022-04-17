@@ -2,22 +2,22 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status, viewsets, generics
+from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from .paginations import LimitPagination
-
-from .filters import IngredientFilter, RecipeFilter
-from recipes.models import Favorite, Recipe, ShoppingCart
 from ingredients.models import Ingredient, RecipeIngredient
+from recipes.models import Favorite, Recipe, ShoppingCart
 from tags.models import Tag
 from users.models import Follow, User
+
+from .filters import IngredientFilter, RecipeFilter
+from .paginations import LimitPagination
 from .permissions import IsAuthor, IsReadOnly
-from .serializers import (IngredientSerializer, RecipeCreateSerializer,
-                          RecipeSerializer, TagSerializer, TargetSerializer,
-                          FollowSerializer, UserSerializer)
+from .serializers import (FollowSerializer, IngredientSerializer,
+                          RecipeCreateSerializer, RecipeSerializer,
+                          TagSerializer, TargetSerializer, UserSerializer)
 
 
 class TagViewSet(viewsets.ModelViewSet):
