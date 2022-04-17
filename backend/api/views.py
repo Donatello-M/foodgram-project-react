@@ -2,20 +2,22 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics, status, viewsets
+from rest_framework import status, viewsets, generics
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from ..recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                              ShoppingCart, Tag)
-from ..users.models import Follow, User
-from .filters import IngredientFilter, RecipeFilter
 from .paginations import LimitPagination
+
+from .filters import IngredientFilter, RecipeFilter
+from recipes.models import Favorite, Recipe, ShoppingCart
+from ingredients.models import Ingredient, RecipeIngredient
+from tags.models import Tag
+from users.models import Follow, User
 from .permissions import IsAuthor, IsReadOnly
-from .serializers import (FollowSerializer, IngredientSerializer,
-                          RecipeCreateSerializer, RecipeSerializer,
-                          TagSerializer, TargetSerializer, UserSerializer)
+from .serializers import (IngredientSerializer, RecipeCreateSerializer,
+                          RecipeSerializer, TagSerializer, TargetSerializer,
+                          FollowSerializer, UserSerializer)
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -78,18 +80,30 @@ class RecipeViewSet(viewsets.ModelViewSet):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    @action(detail=True, methods=['POST', 'DELETE'],
-            permission_classes=[IsAuthenticated],)
+    @action(
+        detail=True,
+        methods=['POST', 'DELETE'],
+        permission_classes=[IsAuthenticated],
+    )
     def favorite(self, request, id=None):
-        response = self.processing_item(request=request, id=id,
-                                        obj=Favorite,)
+        response = self.processing_item(
+            request=request,
+            id=id,
+            obj=Favorite,
+        )
         return response
 
-    @action(detail=True, methods=['POST', 'DELETE'],
-            permission_classes=[IsAuthenticated],)
+    @action(
+        detail=True,
+        methods=['POST', 'DELETE'],
+        permission_classes=[IsAuthenticated],
+    )
     def shopping_cart(self, request, id=None):
-        response = self.processing_item(request=request, id=id,
-                                        obj=ShoppingCart,)
+        response = self.processing_item(
+            request=request,
+            id=id,
+            obj=Cart,
+        )
         return response
 
     @action(detail=False, methods=['GET'],
@@ -99,13 +113,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             recipe__shopping_cart__user=request.user
         ).values(
             'ingredients__name',
-            'ingredients__measurement_unit'
+            'ingredients__unit'
         ).annotate(total_amount=Sum('amount')).order_by()
         products = [
             (
                 f"{ingredient['ingredients__name']}\t --"
                 f" {ingredient['total_amount']}\t"
-                f"({ingredient['ingredients__measurement_unit']})\n"
+                f"({ingredient['ingredients__unit']})\n"
             )
             for ingredient in ingredients]
         response = HttpResponse(products, content_type='text/plain')

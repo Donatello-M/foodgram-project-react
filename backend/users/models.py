@@ -3,15 +3,23 @@ from django.db import models
 
 
 class User(AbstractUser):
-    email = models.EmailField(null=False, unique=True, verbose_name='email')
-    bio = models.TextField(
-        max_length=255,
-        blank=True,
-        verbose_name="О себе"
-    )
+    ADMIN = 'admin'
+    USER = 'user'
+    CHOICES = (
+        (ADMIN, 'admin'),
+        (USER, 'user'),)
+    personal_info = models.TextField(max_length=255, blank=True,
+                                     verbose_name='Информация о себе')
+    email = models.EmailField(null=False, unique=True, verbose_name='Эл.почта')
 
     class Meta:
         ordering = ('username',)
+        verbose_name = 'user'
+        verbose_name_plural = 'users'
+
+    @property
+    def is_admin(self):
+        return self.role == self.ADMIN or self.is_staff
 
     def __str__(self):
         return self.username

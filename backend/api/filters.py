@@ -2,7 +2,7 @@ from django_filters import (ChoiceFilter, FilterSet, ModelChoiceFilter,
                             ModelMultipleChoiceFilter)
 from rest_framework.filters import SearchFilter
 
-from ..recipes.models import Recipe, Tag, User
+from recipes.models import Recipe, Tag, User
 
 
 class IngredientFilter(SearchFilter):
@@ -34,7 +34,7 @@ class RecipeFilter(FilterSet):
             return queryset.filter(favorites__user=self.request.user)
         return queryset
 
-    def filter_is_in_shopping_cart(self, queryset, name, value):
+    def filter_is_in_cart(self, queryset, name, value):
         if int(value) == 1 and not self.request.user.is_anonymous:
             return queryset.filter(shopping_cart__user=self.request.user)
         return queryset
