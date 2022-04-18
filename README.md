@@ -1,4 +1,4 @@
-![example workflow](https://github.com/Donatello-M/foodgram-project-react/actions/workflows/yamdb_workflow.yml/badge.svg)
+![example workflow](https://github.com/Donatello-M/foodgram-project-react/actions/workflows/main.yml/badge.svg)
 # Продуктовый помощник
 
 **Foodgram** - это сервис, позволяющий создавать и делиться своми уникальными рецептами и подписываться на таких же умелых кулинаров, как Вы. 
