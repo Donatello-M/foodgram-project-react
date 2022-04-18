@@ -60,7 +60,7 @@ python manage.py migrate
 - Docker
 - GitHub Actions
 - IDLE ~ SublimeText3
-- Linux (Mint)
+- MacOS
 - nginx
 - PostgreSQL
 - Python3
