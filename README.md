@@ -63,4 +63,4 @@ python manage.py migrate
 - MacOS
 - nginx
 - PostgreSQL
-- Python3
+- Python3.7
