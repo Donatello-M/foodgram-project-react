@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     'djoser',
     'api',
     'tags',
-    'ingredients',
     'users',
     'recipes',
 ]

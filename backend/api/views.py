@@ -7,8 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from ingredients.models import Ingredient, RecipeIngredient
-from recipes.models import Favorite, Recipe, Cart
+from recipes.models import Favorite, Recipe, Cart, Ingredient, RecipeIngredient
 from tags.models import Tag
 from users.models import Follow, User
 
