@@ -16,7 +16,7 @@ class RecipeFilter(FilterSet):
     )
     is_in_shopping_cart = ChoiceFilter(
         choices=enumerate([0, 1]),
-        method='filter_is_in_shopping_cart'
+        method='filter_is_in_cart'
     )
     author = ModelChoiceFilter(queryset=User.objects.all())
     tags = ModelMultipleChoiceFilter(
@@ -27,7 +27,7 @@ class RecipeFilter(FilterSet):
 
     class Meta:
         model = Recipe
-        fields = ('is_favorited', 'is_in_shopping_cart', 'author', 'tags')
+        fields = ('is_favorited', 'is_in_cart', 'author', 'tags')
 
     def filter_is_favorited(self, queryset, name, value):
         if int(value) == 1 and not self.request.user.is_anonymous:
