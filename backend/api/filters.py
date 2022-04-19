@@ -14,7 +14,7 @@ class RecipeFilter(FilterSet):
         choices=enumerate([0, 1]),
         method='filter_is_favorited'
     )
-    is_in_shopping_cart = ChoiceFilter(
+    is_in_cart = ChoiceFilter(
         choices=enumerate([0, 1]),
         method='filter_is_in_cart'
     )
@@ -36,5 +36,5 @@ class RecipeFilter(FilterSet):
 
     def filter_is_in_cart(self, queryset, name, value):
         if int(value) == 1 and not self.request.user.is_anonymous:
-            return queryset.filter(shopping_cart__user=self.request.user)
+            return queryset.filter(cart__user=self.request.user)
         return queryset
