@@ -1,5 +1,5 @@
 ![example workflow](https://github.com/Donatello-M/foodgram-project-react/actions/workflows/main.yml/badge.svg)
-# Продуктовый помощник
+# [Продуктовый помощник](http://51.250.98.201)
 
 **Foodgram** - это сервис, позволяющий создавать и делиться своми уникальными рецептами и подписываться на таких же умелых кулинаров, как Вы. 
 
