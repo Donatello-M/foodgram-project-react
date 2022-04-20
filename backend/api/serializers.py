@@ -43,14 +43,6 @@ class TagSerializer(serializers.ModelSerializer):
             'id', 'name', 'color', 'slug',
         )
 
-    def validate_hex_code(self, color):
-        pattern = '^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$'
-        if not compile(pattern, color):
-            raise ValidationError(
-                'HEX-код должен состоять из 6 символов и начинаться с #'
-            )
-        return color
-
 
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
