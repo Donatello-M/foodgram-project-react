@@ -79,4 +79,4 @@ jobs:
             echo DB_HOST=${{ secrets.DB_HOST }} >> .env
             echo DJANGO_KEY=${{ secrets.DJANGO_KEY }} >> .env
             echo HOST=${{ secrets.HOST }} >> .env
-            sudo docker-compose -f infra/docker-compose.yml up -d
+            sudo docker-compose -f ../infra/docker-compose.yml up -d
