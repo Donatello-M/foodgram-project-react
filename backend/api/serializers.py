@@ -3,7 +3,6 @@ from re import compile
 from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 
 from recipes.models import Favorite, Recipe, Cart, Ingredient, RecipeIngredient
 from tags.models import Tag
