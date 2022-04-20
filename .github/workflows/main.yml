@@ -68,6 +68,7 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             sudo docker pull amapeacelord/foodgram
+            cd foodgram-project-react/infra/
             sudo docker-compose stop
             sudo docker-compose rm backend
             rm .env
