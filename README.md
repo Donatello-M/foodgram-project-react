@@ -55,12 +55,13 @@ python manage.py migrate
 Увидеть спецификацию API вы сможете по адресу <http://localhost/api/docs/>
 
 > **Технологии**
-- Django
-- Django REST Framework
-- Docker
+- Django🙃
+- Django REST Framework🥵
+- Docker🐋
 - GitHub Actions
-- IDLE ~ SublimeText3
+- PyCharm🥴
+- vim🥲
 - MacOS
 - nginx
-- PostgreSQL
-- Python3.7
+- PostgreSQL🐘
+- Python3.7🐍
