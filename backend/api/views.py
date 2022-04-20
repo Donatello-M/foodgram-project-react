@@ -97,7 +97,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         methods=['POST', 'DELETE'],
         permission_classes=[IsAuthenticated],
     )
-    def cart(self, request, id=None):
+    def shopping_cart(self, request, id=None):
         response = self.processing_item(
             request=request,
             id=id,
@@ -107,7 +107,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['GET'],
             permission_classes=[IsAuthenticated])
-    def download_cart(self, request):
+    def download_shopping_cart(self, request):
         ingredients = RecipeIngredient.objects.filter(
             recipe__cart__user=request.user
         ).values(
