@@ -1,5 +1,3 @@
-from re import compile
-
 from django.db import models
 
 
