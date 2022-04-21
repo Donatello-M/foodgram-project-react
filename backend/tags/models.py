@@ -9,7 +9,7 @@ class Tag(models.Model):
     color = models.CharField(
         max_length=7,
         blank=True,
-        verbose_name='Цвет, HEX-code',
+        verbose_name='HEX-code',
     )
     slug = models.SlugField(
         max_length=200,

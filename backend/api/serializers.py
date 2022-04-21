@@ -1,8 +1,10 @@
 from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
-from recipes.models import Favorite, Recipe, Cart, Ingredient, RecipeIngredient
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart)
 from tags.models import Tag
 from users.models import Follow, User
 
@@ -13,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         fields = (
             'id', 'username', 'email', 'first_name', 'last_name',
-            'personal_info', 'is_subscribed', 'password',
+            'about', 'is_subscribed', 'password',
         )
         read_only_fields = ('id',)
         model = User
@@ -29,7 +31,8 @@ class UserSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, author):
         user = self.context.get('request').user
         return not user.is_anonymous and Follow.objects.filter(
-            user=user, author=author.id
+            user=user,
+            author=author.id
         ).exists()
 
 
@@ -45,19 +48,21 @@ class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
         fields = (
-            'id', 'name', 'unit',
+            'id', 'name', 'measurement_unit',
         )
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='ingredients.id')
     name = serializers.ReadOnlyField(source='ingredients.name')
-    unit = serializers.ReadOnlyField(source='ingredients.unit')
+    measurement_unit = serializers.ReadOnlyField(
+        source='ingredients.measurement_unit')
 
     class Meta:
         model = RecipeIngredient
         fields = (
-            'id', 'name', 'unit', 'amount',
+            'id', 'name',
+            'measurement_unit', 'amount',
         )
 
 
@@ -81,15 +86,15 @@ class RecipeSerializer(serializers.ModelSerializer):
         many=True,
     )
     is_favorited = serializers.SerializerMethodField()
-    is_in_cart = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
     author = UserSerializer(read_only=True)
     image = Base64ImageField(max_length=None)
 
     class Meta:
         model = Recipe
         fields = (
-            'id', 'name', 'text', 'ingredients', 'cooking_time', 'tags',
-            'image', 'is_in_cart', 'is_favorited', 'author',
+            'id', 'name', 'desc', 'ingredients', 'cooking_time', 'tags',
+            'image', 'is_in_shopping_cart', 'is_favorited', 'author',
         )
         read_only_fields = (
             'id', 'author',
@@ -97,17 +102,17 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, recipe):
         user = self.context.get('request').user
-        if (user.is_authenticated and Favorite.objects.filter(
-                user=user, recipe=recipe
-        ).exists()):
+        if user.is_authenticated and Favorite.objects.filter(user=user,
+                                                             recipe=recipe
+                                                             ).exists():
             return True
         return False
 
-    def get_is_in_cart(self, recipe):
+    def get_is_in_shopping_cart(self, recipe):
         user = self.context.get('request').user
-        if (user.is_authenticated and Cart.objects.filter(
-                user=user, recipe=recipe
-        ).exists()):
+        if (user.is_authenticated
+            and ShoppingCart.objects.filter(user=user,
+                                            recipe=recipe).exists()):
             return True
         return False
 
@@ -126,7 +131,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = (
-            'id', 'name', 'text', 'ingredients',
+            'id', 'name', 'desc', 'ingredients',
             'cooking_time', 'tags', 'image'
         )
 
@@ -135,10 +140,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Введите название рецепта')
         return name
 
-    def validate_text(self, text):
-        if not text:
+    def validate_desc(self, desc):
+        if not desc:
             raise serializers.ValidationError('Добавьте описание рецепта')
-        return text
+        return desc
 
     def validate_tags(self, tags):
         if (not tags) or (len(tags) != len(set(tags))):
@@ -146,8 +151,12 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return tags
 
     def validate_ingredients(self, ingredients):
-        if not ingredients:
+        if not ingredients or ingredients.amount < 1:
             raise serializers.ValidationError('Добавьте ингридиенты')
+        if ingredients.amount < 1:
+            raise serializers.ValidationError(
+                'Отрицательное значение? Серьезно?'
+            )
         unique_check = list()
         for ingredient in ingredients:
             ingredient_id = ingredient.get('ingredients').get('id')
@@ -162,6 +171,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def validate_cooking_time(self, cooking_time):
         if not cooking_time:
             raise serializers.ValidationError('Укажите время приготовления')
+        if cooking_time < 1:
+            raise serializers.ValidationError(
+                'Отрицательное значение? Серьезно?'
+            )
         return cooking_time
 
     def create_link_ingredients(self, ingredients, recipe):
@@ -196,7 +209,8 @@ class TargetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = (
-            'id', 'tags', 'name', 'image', 'cooking_time',
+            'id', 'tags', 'name',
+            'image', 'cooking_time',
         )
 
 
@@ -208,9 +222,14 @@ class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'email', 'id', 'username', 'first_name', 'last_name',
-            'is_subscribed', 'recipes', 'recipes_count'
+            'email', 'id', 'username', 'first_name',
+            'last_name', 'is_subscribed', 'recipes', 'recipes_count'
         )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Follow.objects.all(),
+                fields=('user', 'author'))
+        ]
 
     def get_recipes_count(self, author):
         return author.recipes.count()
@@ -227,5 +246,6 @@ class FollowSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, author):
         user = self.context.get('request').user
         return not user.is_anonymous and Follow.objects.filter(
-            user=user, author=author.id
+            user=user,
+            author=author.id
         ).exists()

@@ -2,27 +2,19 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics, status, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from recipes.models import Favorite, Recipe, Cart, Ingredient, RecipeIngredient
-from tags.models import Tag
-from users.models import Follow, User
+from api.filters import IngredientFilter, RecipeFilter
+from api.paginations import LimitPagination
+from api.permissions import IsAuthor, IsReadOnly
+from api.serializers import (IngredientSerializer, RecipeCreateSerializer,
+                             RecipeSerializer, TargetSerializer)
 
-from .filters import IngredientFilter, RecipeFilter
-from .paginations import LimitPagination
-from .permissions import IsAuthor, IsReadOnly
-from .serializers import (FollowSerializer, IngredientSerializer,
-                          RecipeCreateSerializer, RecipeSerializer,
-                          TagSerializer, TargetSerializer, UserSerializer)
-
-
-class TagViewSet(viewsets.ModelViewSet):
-    queryset = Tag.objects.all()
-    serializer_class = TagSerializer
-    permission_classes = [AllowAny]
+from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                     ShoppingCart)
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
@@ -101,7 +93,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         response = self.processing_item(
             request=request,
             id=id,
-            obj=Cart,
+            obj=ShoppingCart,
         )
         return response
 
@@ -109,65 +101,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
         ingredients = RecipeIngredient.objects.filter(
-            recipe__cart__user=request.user
+            recipe__shopping_cart__user=request.user
         ).values(
             'ingredients__name',
-            'ingredients__unit'
-        ).annotate(total_amount=Sum('amount')).order_by()
+            'ingredients__measurement_unit'
+        ).annotate(total_amount=Sum('amount'))
         products = [
             (
                 f"{ingredient['ingredients__name']}\t --"
                 f" {ingredient['total_amount']}\t"
-                f"({ingredient['ingredients__unit']})\n"
+                f"({ingredient['ingredients__measurement_unit']})\n"
             )
             for ingredient in ingredients]
         response = HttpResponse(products, content_type='text/plain')
         attachment = 'attachment; filename="products.txt"'
         response['Content-Disposition'] = attachment
         return response
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [AllowAny]
-    lookup_field = 'id'
-
-    @action(detail=False, methods=['GET'],
-            permission_classes=[IsAuthenticated])
-    def me(self, request):
-        data = UserSerializer(
-            self.request.user,
-            context={'request': request}).data
-        return Response(data)
-
-    @action(detail=True, methods=['POST', 'DELETE'],
-            permission_classes=[IsAuthenticated])
-    def subscribe(self, request, id):
-        author = get_object_or_404(User, id=id)
-        user = request.user
-        if request.method == 'POST':
-            if Follow.objects.filter(user=user, author=author).exists():
-                return Response({"errors": "Вы уже подписаны на этого автора"},
-                                status=status.HTTP_400_BAD_REQUEST)
-            elif author == user:
-                return Response({"errors": "Нельзя подписываться на себя"},
-                                status=status.HTTP_400_BAD_REQUEST)
-
-            Follow.objects.create(user=user, author=author)
-            data = UserSerializer(
-                author,
-                context={'request': request}).data
-            return Response(data, status=status.HTTP_201_CREATED)
-
-        Follow.objects.filter(user=user, author=author).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class SubscriptionListView(generics.ListAPIView):
-    serializer_class = FollowSerializer
-    permission_classes = [IsAuthenticated]
-    pagination_class = LimitPagination
-
-    def get_queryset(self):
-        return User.objects.filter(following__user=self.request.user)

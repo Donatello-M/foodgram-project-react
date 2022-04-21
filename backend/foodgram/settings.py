@@ -1,6 +1,3 @@
-
-# SECRET_KEY = 'django-insecure-6edn#vlts6y&j&jk*2j=5tyf3!@4&7zuha3z2dek2(7wo=&ojl'
-
 import os
 from datetime import timedelta
 
@@ -12,7 +9,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.getenv('DJANGO_KEY')
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -27,10 +24,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'djoser',
-    'api',
-    'tags',
     'users',
     'recipes',
+    'tags',
 ]
 
 MIDDLEWARE = [

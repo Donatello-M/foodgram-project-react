@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Cart, Favorite, Recipe, Ingredient, RecipeIngredient
+from .models import (Favorite, Ingredient, Recipe,
+                     RecipeIngredient, ShoppingCart)
 
 
 @admin.register(Recipe)
@@ -13,12 +14,12 @@ class RecipeAdmin(admin.ModelAdmin):
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'unit',
+        'name', 'measurement_unit',
     )
     list_filter = ('name',)
     search_fields = ('name',)
 
 
 admin.site.register(RecipeIngredient)
-admin.site.register(Cart)
+admin.site.register(ShoppingCart)
 admin.site.register(Favorite)
