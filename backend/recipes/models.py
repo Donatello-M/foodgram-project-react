@@ -36,7 +36,7 @@ class Recipe(models.Model):
         max_length=200,
         verbose_name='Название',
     )
-    desc = models.TextField(
+    text = models.TextField(
         verbose_name='Описание',
     )
     image = models.ImageField(

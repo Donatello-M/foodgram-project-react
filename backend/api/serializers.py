@@ -93,7 +93,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = (
-            'id', 'name', 'desc', 'ingredients', 'cooking_time', 'tags',
+            'id', 'name', 'text', 'ingredients', 'cooking_time', 'tags',
             'image', 'is_in_shopping_cart', 'is_favorited', 'author',
         )
         read_only_fields = (
@@ -131,7 +131,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = (
-            'id', 'name', 'desc', 'ingredients',
+            'id', 'name', 'text', 'ingredients',
             'cooking_time', 'tags', 'image'
         )
 
@@ -140,10 +140,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Введите название рецепта')
         return name
 
-    def validate_desc(self, desc):
-        if not desc:
+    def validate_text(self, text):
+        if not text:
             raise serializers.ValidationError('Добавьте описание рецепта')
-        return desc
+        return text
 
     def validate_tags(self, tags):
         if (not tags) or (len(tags) != len(set(tags))):
@@ -151,7 +151,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return tags
 
     def validate_ingredients(self, ingredients):
-        if not ingredients or ingredients.amount < 1:
+        if not ingredients or ingredients.amount < 0:
             raise serializers.ValidationError('Добавьте ингридиенты')
         if ingredients.amount < 1:
             raise serializers.ValidationError(
@@ -171,7 +171,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def validate_cooking_time(self, cooking_time):
         if not cooking_time:
             raise serializers.ValidationError('Укажите время приготовления')
-        if cooking_time < 1:
+        if cooking_time < 0:
             raise serializers.ValidationError(
                 'Отрицательное значение? Серьезно?'
             )
