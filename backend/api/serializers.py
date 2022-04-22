@@ -162,7 +162,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 unique_check.append(ingredient_id)
             else:
                 raise serializers.ValidationError('Проверьте id ингредиентов')
-            if ingredient.amount < 0:
+            if ingredient.get('amount') < 0:
                 raise serializers.ValidationError(
                     'Отрицательное значение? Серьезно?'
                 )
