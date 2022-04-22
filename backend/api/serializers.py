@@ -9,6 +9,8 @@ from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
 from tags.models import Tag
 from users.models import Follow, User
 
+from re import match
+
 
 class UserSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
@@ -46,7 +48,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     def validate_hex_color(self, color):
         pattern = '^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$'
-        if not compile(pattern, color):
+        if not match(pattern, color):
             raise ValidationError(
                 'HEX-код должен состоять из 6 символов и начинаться с #'
             )
