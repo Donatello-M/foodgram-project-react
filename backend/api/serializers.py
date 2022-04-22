@@ -1,10 +1,10 @@
+from django.core.validators import ValidationError
 from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
-from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
-
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart)
+from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 from tags.models import Tag
 from users.models import Follow, User
 
@@ -42,6 +42,13 @@ class TagSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name', 'color', 'slug',
         )
+
+    def validate_hex_color(self, color):
+        pattern = '^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$'
+        if not compile(pattern, color):
+            raise ValidationError(
+                'HEX-код должен состоять из 6 символов и начинаться с #'
+            )
 
 
 class IngredientSerializer(serializers.ModelSerializer):

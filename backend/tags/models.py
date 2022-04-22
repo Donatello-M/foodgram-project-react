@@ -1,5 +1,7 @@
 from django.db import models
 
+from .validators import hex_code_validator
+
 
 class Tag(models.Model):
     name = models.CharField(
@@ -9,6 +11,7 @@ class Tag(models.Model):
     color = models.CharField(
         max_length=7,
         blank=True,
+        validators=[hex_code_validator],
         verbose_name='HEX-code',
     )
     slug = models.SlugField(
